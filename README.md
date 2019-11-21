@@ -5,11 +5,11 @@ Software to view and analyze data from PAR potentiostats
 ## Dependences
 
 - Python 3
-- Matplotlib
+- matplotlib
 - PyQt5
-- Numpy
-- Scipy
-- Peakutils
+- numpy
+- scipy
+- peakutils
 
 
 Optional:

@@ -86,7 +86,7 @@ class ViewWindow (QMainWindow):
         QMainWindow.__init__(self, parent)
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle("viewPAR")
-        self.diameter = 1.1
+        self.area = 1
 
         self.filename = ""
 
@@ -159,9 +159,9 @@ class ViewWindow (QMainWindow):
         self.setFocus()
 
     def showAreaDialog(self):
-        diameter, okPressed = QInputDialog.getText(self, "Electrode diameter", u"d (cm): ", QLineEdit.Normal, str(self.diameter))
-        if okPressed and diameter != '':
-            self.diameter = float(diameter)
+        area, okPressed = QInputDialog.getText(self, "Electrode area", u"Area (cm^2): ", QLineEdit.Normal, str(self.area))
+        if okPressed and area != '':
+            self.area = float(area)
 
 
     def fileQuit(self):
@@ -284,8 +284,8 @@ class ViewWindow (QMainWindow):
 
     def extractdata(self, filename):
         milliamps = True
-        diameter = self.diameter
-        exdata = extractdata.ExtractData(filename, milliamps, diameter)
+        area = self.area
+        exdata = extractdata.ExtractData(filename, milliamps, area)
         xdata, ydata, zdata, labels = exdata.get_data()
 
         return xdata, ydata, zdata, labels
@@ -304,8 +304,7 @@ class ViewWindow (QMainWindow):
             xdata, ydata = self.canvas.axes.lines[i].get_data()
             #FIXME: detect current range
             ampohms = resistance/1000
-            area = math.pi * (self.diameter / 2) ** 2
-            ytocur = np.array(ydata).astype(float) * area
+            ytocur = np.array(ydata).astype(float) * self.area
             newxdata = np.array(xdata).astype(float) - ampohms*np.array(ytocur).astype(float)
             newxdata = newxdata.tolist()
             newxs.append(newxdata)
@@ -1047,10 +1046,9 @@ class ViewWindow (QMainWindow):
     def integrateOverTime(self):
         tsec, ydata = self.canvas.theplot[0].get_data()
 
-        area = math.pi * (self.diameter / 2) ** 2
-        print("Area (cm2): ", area)
+        print("Area (cm2): ", self.area)
 
-        ycurrent = np.asarray(ydata).astype(float)*area # Convert density to total current
+        ycurrent = np.asarray(ydata).astype(float)*self.area # Convert density to total current
 
         xnew = np.linspace(tsec[0], tsec[-1], num=int(len(tsec)-1))
         interpdata = interp1d(tsec, ycurrent, 'cubic')

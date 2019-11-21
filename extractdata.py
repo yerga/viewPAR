@@ -7,7 +7,7 @@ from scipy.signal import savgol_filter
 import math
 
 class ExtractData:
-    def __init__(self, filenames, milliamps, diameter):
+    def __init__(self, filenames, milliamps, area):
 
         detection = DetectType(filenames)
         filetypes = detection.get_filetypes()
@@ -16,7 +16,7 @@ class ExtractData:
         if filetypes[0] == ".cor":
             format = "PAR"
             parfiles = PARfiles(filenames)
-            self.xdata, self.ydata, self.zdata, self.labels = parfiles.get_data(milliamps, diameter)
+            self.xdata, self.ydata, self.zdata, self.labels = parfiles.get_data(milliamps, area)
         elif filetypes[0] == ".csv" or ".CSV":
             format = "CSV"
             csvfiles = CSVfiles(filenames)
@@ -27,7 +27,7 @@ class ExtractData:
                 self.labels = ["t / min", "Counts"]
                 self.xdata, self.ydata, self.zdata = csvfiles.get_hplc_data()
             else:
-                self.xdata, self.ydata, self.zdata = csvfiles.get_data(milliamps, diameter)
+                self.xdata, self.ydata, self.zdata = csvfiles.get_data(milliamps, area)
         elif filetypes[0] == ".txt":
             txtfiles = TXTfiles(filenames)
             self.xdata, self.ydata, self.zdata, self.labels = txtfiles.get_data()
@@ -201,7 +201,7 @@ class PARfiles:
         self.filenames = filenames
 
 
-    def get_data(self, milliamps, diameter):
+    def get_data(self, milliamps, area):
         potentials = []
         currents = []
         exptimes = []
@@ -242,7 +242,6 @@ class PARfiles:
                 print("Potential Scan/Hold")
                 technique = "Potentiostatic"
 
-            area = math.pi * (diameter/2)**2
             print ("Area (cm2): ", area)
             normalizearea = True
 
@@ -341,7 +340,7 @@ class CSVfiles:
         return exptime, counts, zdata
 
 
-    def get_data(self, milliamps, diameter):
+    def get_data(self, milliamps, area):
         potentials = []
         currents = []
         exptimes = []
@@ -359,7 +358,6 @@ class CSVfiles:
             current = []
             exptime = []
 
-            area = math.pi * (diameter/2)**2
             print ("Area (cm2): ", area)
             normalizearea = True
 

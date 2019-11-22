@@ -14,3 +14,7 @@ Software to view and analyze data from PAR potentiostats
 
 Optional:
 - Pandas
+
+
+
+![ViewPAR](https://github.com/yerga/viewPAR/blob/master/docs/web/viewPAR.png)

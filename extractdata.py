@@ -542,7 +542,7 @@ class CSVfiles:
 
     def get_column_data(self, numcol):
         datatotal = []
-        for i in range(2, self.numrows - 1):
+        for i in range(0, self.numrows):
             data = self.datacsv[i][numcol].replace(self.dotsreplace3, '').replace(self.dotsreplace1, self.dotsreplace2)
             if data != '':
                 data = float(data)

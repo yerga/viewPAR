@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 from matplotlib import transforms
 from PyQt5.QtCore import Qt, QSettings
 from PyQt5.QtWidgets import QFileDialog, QApplication, QMainWindow, QSizePolicy, QInputDialog, QLineEdit, QDialog, \
-    QVBoxLayout, QComboBox, QLabel, QDialogButtonBox, QCheckBox
+    QVBoxLayout, QComboBox, QLabel, QDialogButtonBox, QCheckBox, QPushButton
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
@@ -124,7 +124,7 @@ class ViewWindow (QMainWindow):
         self.actionPeaks.triggered.connect(self.showFitdialog)
 
         self.actionExport = self.ui.actionExport
-        self.actionExport.triggered.connect(self.exportData)
+        self.actionExport.triggered.connect(lambda: self.exportData(self.canvas, False))
 
         self.actionMulti = self.ui.actionMulti
         self.actionMulti.triggered.connect(self.showMultiCVdialog)
@@ -592,10 +592,10 @@ class ViewWindow (QMainWindow):
 
     def setupUI_Tafeldialog(self, tafeldialog):
         layout = QVBoxLayout()
-        lbl = QLabel("Start potential (V)")
+        lbl = QLabel("Initial X value")
         startpot = QLineEdit()
 
-        lbl2 = QLabel("End potential (V)")
+        lbl2 = QLabel("Final X value")
         endpot = QLineEdit()
 
         layout.addWidget(lbl)
@@ -606,11 +606,16 @@ class ViewWindow (QMainWindow):
         layout.addWidget(endpot)
         layout.addStretch()
 
+        tafelcurrcb = QCheckBox("Current is X data")
+        tafelcurrcb.setChecked(True)
+        layout.addWidget(tafelcurrcb)
+        layout.addStretch()
+
         buttonBox = QDialogButtonBox(tafeldialog)
         buttonBox.setGeometry(50, 240, 341, 32)
         buttonBox.setOrientation(Qt.Horizontal)
         buttonBox.setStandardButtons(QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
-        buttonBox.accepted.connect(lambda: self.calculateTafel(startpot.text(), endpot.text()))
+        buttonBox.accepted.connect(lambda: self.calculateTafel(startpot.text(), endpot.text(), tafelcurrcb.isChecked()))
         buttonBox.accepted.connect(tafeldialog.accept)
         buttonBox.rejected.connect(tafeldialog.reject)
         layout.addWidget(buttonBox)
@@ -618,27 +623,38 @@ class ViewWindow (QMainWindow):
         return layout
 
 
-    def calculateTafel(self, startpot, endpot):
+    def calculateTafel(self, startvalue, endvalue, tafelcurr):
         #FIXME: get all lines
         #line = self.canvas.theplot[0]
         xdata, ydata = self.canvas.theplot[0].get_data()
 
-        ind1, indvalue1 = find_nearest(np.array(xdata[0:int(len(xdata)/2)]).astype(float), float(startpot))
-        ind2, indvalue2 = find_nearest(np.array(xdata[0:int(len(xdata)/2)]).astype(float), float(endpot))
+        if tafelcurr:
+            dataregion = xdata
+        else:
+            dataregion = xdata[0:int(len(xdata) / 2)]
 
-        print (ind1, indvalue1)
-        print (ind2, indvalue2)
+        ind1, indvalue1 = find_nearest(np.array(dataregion).astype(float), float(startvalue))
+        ind2, indvalue2 = find_nearest(np.array(dataregion).astype(float), float(endvalue))
+
+        print(ind1, indvalue1)
+        print(ind2, indvalue2)
 
         xdata = xdata[ind1:ind2]
         ydata = ydata[ind1:ind2]
 
-        print ("xdata: ", xdata)
-        print ("ydata: ", ydata)
+        print("xdata: ", xdata)
+        print("ydata: ", ydata)
 
-        fig, axis = plt.subplots(1, 1)
-        lognumber = np.log10(np.array(ydata).astype(float))
-        line2, = axis.plot(lognumber, xdata, ls="-")
-        slope1, intercept1, r_value1, p_value1, std_err1 = stats.linregress(lognumber, np.array(xdata).astype(float))
+        if tafelcurr:
+            lognumber = np.log10(np.array(xdata).astype(float))
+            yplot = ydata
+        else:
+            lognumber = np.log10(np.array(ydata).astype(float))
+            yplot = xdata
+
+        fig, axis = plt.subplots(1,1)
+        line2, = axis.plot(lognumber, yplot, ls="-")
+        slope1, intercept1, r_value1, p_value1, std_err1 = stats.linregress(lognumber, np.array(yplot).astype(float))
         linefit = slope1 * np.array(lognumber) + intercept1
         axis.plot(lognumber, linefit, ':', label=str(int(round(slope1, 3) * 1000)) + " mV/dec")
         # print ('slope: ', slope1, '; intercept: ', intercept1)
@@ -646,6 +662,10 @@ class ViewWindow (QMainWindow):
         axis.set_ylabel("E")
         leg = axis.legend(loc='best', shadow=False)
         fig.tight_layout()
+        #print("lines: ", axis.lines)
+        savebutton = QPushButton("CSV")
+        savebutton.clicked.connect(lambda: self.exportData(axis, True))
+        fig.canvas.manager.toolbar.addWidget(savebutton)
         fig.show()
 
 
@@ -944,11 +964,16 @@ class ViewWindow (QMainWindow):
         fig.show()
 
 
-    def exportData(self):
-        numlines = len(self.canvas.axes.lines)
+    def exportData(self, canvas, tafel):
+        if tafel:
+            axes = canvas
+        else:
+            axes = canvas.axes
+
+        numlines = len(axes.lines)
         datas = []
         for i in range(numlines):
-            x, y = self.canvas.axes.lines[i].get_data()
+            x, y = axes.lines[i].get_data()
             datas.append(x)
             datas.append(y)
 

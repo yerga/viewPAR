@@ -22,7 +22,7 @@ Optional:
 - Convert E to other reference electrodes
 - Calculate Tafel slope
 - Correct iR drop
-- Calculate Q under voltammetric peak or for galvanostatic
+- Calculate Q under voltammetric peak or for galvanostatic curve
 - Separate curves from files with multiple curves
 - Plot the derivative of a curve
 - Smooth curves

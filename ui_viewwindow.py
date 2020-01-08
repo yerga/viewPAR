@@ -2,18 +2,16 @@
 
 # Form implementation generated from reading ui file 'viewwindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.3
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
-
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_ViewWindow(object):
     def setupUi(self, ViewWindow):
         ViewWindow.setObjectName("ViewWindow")
-        ViewWindow.resize(600, 600)
+        ViewWindow.resize(675, 600)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -28,7 +26,7 @@ class Ui_ViewWindow(object):
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
         ViewWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(ViewWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 600, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 675, 22))
         self.menubar.setObjectName("menubar")
         ViewWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(ViewWindow)
@@ -36,7 +34,7 @@ class Ui_ViewWindow(object):
         ViewWindow.setStatusBar(self.statusbar)
         self.toolBar = QtWidgets.QToolBar(ViewWindow)
         self.toolBar.setObjectName("toolBar")
-        ViewWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
+        ViewWindow.addToolBar(QtCore.Qt.LeftToolBarArea, self.toolBar)
         self.actionOpen = QtWidgets.QAction(ViewWindow)
         self.actionOpen.setObjectName("actionOpen")
         self.actionOverlay = QtWidgets.QAction(ViewWindow)
@@ -110,3 +108,4 @@ class Ui_ViewWindow(object):
         self.actionmultiPulseQ.setText(_translate("ViewWindow", "multiPulseQ"))
         self.actionDeriv.setText(_translate("ViewWindow", "Deriv"))
         self.actionSmooth.setText(_translate("ViewWindow", "Smooth"))
+
